@@ -92,6 +92,23 @@ def test_hullwhite_reproduces_marginal_pd() -> None:
     assert sp.simplify(mean_q - pd) == 0
 
 
+def test_softmax_derivative_is_weighted_covariance() -> None:
+    # d/db E_w[f] = Cov_w(f, V) for softmax weights w_s(b) ∝ exp(b V_s).
+    # This is the engine behind "alpha is monotone in b": with f = V^+ (a
+    # nondecreasing function of V) the covariance is non-negative, so the
+    # conditional EE — hence the WWR-CVA and alpha — is nondecreasing in b.
+    b = sp.symbols("b", real=True)
+    v = sp.symbols("v1:4", real=True)   # v1, v2, v3
+    f = sp.symbols("f1:4", real=True)   # f1, f2, f3 = f(v_i)
+    z = sum(sp.exp(b * vi) for vi in v)
+    w = [sp.exp(b * vi) / z for vi in v]
+    ew_f = sum(wi * fi for wi, fi in zip(w, f, strict=False))
+    ew_v = sum(wi * vi for wi, vi in zip(w, v, strict=False))
+    ew_fv = sum(wi * fi * vi for wi, fi, vi in zip(w, f, v, strict=False))
+    cov = ew_fv - ew_f * ew_v
+    assert sp.simplify(sp.diff(ew_f, b) - cov) == 0
+
+
 def test_conditional_ee_is_weighted_mean() -> None:
     # conditional EE = sum_s positive_s * w_s with normalised softmax weights.
     b, v1, v2, p1, p2 = sp.symbols("b v1 v2 p1 p2", real=True)
