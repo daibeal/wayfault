@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "wayfault"
-version = "0.1.0"
+version = "0.2.0"
 description = "Wrong-Way Risk (WWR) estimation for counterparty credit risk."
 readme = "README.md"
 requires-python = ">=3.11"
@@ -32,8 +32,11 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/example/wayfault"
-Repository = "https://github.com/example/wayfault"
+Homepage = "https://daibeal.github.io/wayfault/"
+Documentation = "https://daibeal.github.io/wayfault/"
+Repository = "https://github.com/daibeal/wayfault"
+Issues = "https://github.com/daibeal/wayfault/issues"
+Playground = "https://daibeal.github.io/wayfault/playground/"
 
 [project.scripts]
 wayfault = "wayfault.adapters.inbound.cli:main"

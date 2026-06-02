@@ -10,7 +10,7 @@ This page runs the **real `wayfault` library** — the exact same Python wheel y
 
     1. loads the Pyodide runtime from a CDN,
     2. `micropip`-installs the published `wayfault` wheel
-       (`wayfault-0.1.0-py3-none-any.whl`) — a pure-Python wheel, so it just
+       (`wayfault-*-py3-none-any.whl`) — a pure-Python wheel, so it just
        works,
     3. calls `estimate_wwr(...)` and hands the resulting numbers to a JS chart
        library ([Chart.js](https://www.chartjs.org/)) for rendering.
@@ -163,7 +163,11 @@ const CLASS_COLOR = {WRONG_WAY:'#c44e52', RIGHT_WAY:'#55a868', NEUTRAL:'#4c72b0'
     await pyodide.loadPackage(['numpy', 'micropip']);
     set('Installing the wayfault wheel…');
     const here = new URL('.', location.href);
-    const wheelUrl = new URL('../assets/wheels/wayfault-0.1.0-py3-none-any.whl', here).href;
+    // The wheel filename (and version) is resolved from a generated manifest so
+    // the playground always installs whatever version the docs were built with.
+    const manifest = await fetch(new URL('../assets/wheels/manifest.json', here).href)
+      .then(r => r.json());
+    const wheelUrl = new URL('../assets/wheels/' + manifest.wheel, here).href;
     const micropip = pyodide.pyimport('micropip');
     await micropip.install(wheelUrl);
     set('Initializing models…');

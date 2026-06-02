@@ -36,6 +36,8 @@ jobs:
           python -m build --wheel
           mkdir -p docs/assets/wheels
           cp dist/wayfault-*-py3-none-any.whl docs/assets/wheels/
+          wheel=$(cd docs/assets/wheels && ls wayfault-*-py3-none-any.whl | head -1)
+          printf '{"wheel": "%s"}\n' "$wheel" > docs/assets/wheels/manifest.json
       - name: Build site
         run: mkdocs build --strict
       - uses: actions/upload-pages-artifact@v3

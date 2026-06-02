@@ -19,8 +19,9 @@ coverage.xml
 # Docs build
 site/
 
-# Playground wheel (generated locally / rebuilt in CI before mkdocs build)
+# Playground wheel + manifest (generated locally / rebuilt in CI before mkdocs build)
 docs/assets/wheels/*.whl
+docs/assets/wheels/manifest.json
 
 # Venvs
 .venv/
