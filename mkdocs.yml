@@ -37,6 +37,7 @@ theme:
 
 nav:
   - Home: index.md
+  - Playground: playground.md
   - Getting Started: getting-started.md
   - Architecture: architecture.md
   - Dependence Models: models.md

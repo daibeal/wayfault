@@ -18,6 +18,13 @@ Monte-Carlo **exposure cube** and a **credit curve** as inputs and produces:
 The library does **not** generate exposures or bootstrap curves — those are
 inputs.
 
+## 🎮 Live playground
+
+An interactive **[browser playground](https://daibeal.github.io/wayfault/playground/)**
+runs the real `wayfault` wheel via WebAssembly (Pyodide) — no install, no server.
+Adjust the dependence model and parameters and watch the CVA, alpha multiplier,
+and exposure charts recompute live.
+
 ## Architecture
 
 `wayfault` follows a strict **hexagonal (ports & adapters)** design. The

@@ -25,6 +25,11 @@ produces:
 The library does **not** generate exposures or bootstrap curves — those are
 inputs.
 
+!!! tip "Try it live"
+    The **[Playground](playground.md)** runs the real `wayfault` wheel in your
+    browser (via WebAssembly/Pyodide) with an interactive dashboard — adjust the
+    model and watch the CVA, alpha, and exposure charts update live.
+
 ## Why wayfault
 
 !!! tip "Design principles"
