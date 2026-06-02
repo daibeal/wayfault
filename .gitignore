@@ -19,6 +19,14 @@ coverage.xml
 # Docs build
 site/
 
+# LaTeX build artifacts (keep the .pdf and .tex)
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.toc
+paper/*.fls
+paper/*.fdb_latexmk
+
 # Playground wheel + manifest (generated locally / rebuilt in CI before mkdocs build)
 docs/assets/wheels/*.whl
 docs/assets/wheels/manifest.json
