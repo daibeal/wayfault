@@ -25,6 +25,11 @@ io = ["pandas>=2.0", "pyarrow>=12.0"]
 ml = ["scikit-learn>=1.3"]
 viz = ["matplotlib>=3.7"]
 dev = ["pytest>=7.4", "pytest-cov>=4.1", "mypy>=1.8", "ruff>=0.3"]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.25",
+]
 
 [project.urls]
 Homepage = "https://github.com/example/wayfault"
