@@ -42,6 +42,7 @@ nav:
   - Dependence Models: models.md
   - Calibration: calibration.md
   - Visualization: visualization.md
+  - Performance: performance.md
   - CLI: cli.md
   - API Reference:
       - Overview: api/index.md

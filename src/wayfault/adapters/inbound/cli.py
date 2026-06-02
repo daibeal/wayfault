@@ -9,6 +9,10 @@ from collections.abc import Sequence
 
 from wayfault.adapters.inbound.api import estimate_wwr
 from wayfault.adapters.outbound.credit_csv import CsvCreditCurveSource
+from wayfault.adapters.outbound.dependence_archimedean import (
+    ClaytonCopulaModel,
+    FrankCopulaModel,
+)
 from wayfault.adapters.outbound.dependence_copula import GaussianCopulaModel
 from wayfault.adapters.outbound.dependence_hullwhite import HullWhiteHazardModel
 from wayfault.adapters.outbound.dependence_independent import IndependentModel
@@ -17,13 +21,17 @@ from wayfault.adapters.outbound.sinks import JsonReportWriter
 from wayfault.ports.outbound import DependenceModel
 
 
-def _build_model(name: str, b: float, rho: float) -> DependenceModel:
+def _build_model(name: str, b: float, rho: float, theta: float) -> DependenceModel:
     if name == "independent":
         return IndependentModel()
     if name == "hullwhite":
         return HullWhiteHazardModel(b=b)
     if name == "copula":
         return GaussianCopulaModel(rho=rho)
+    if name == "clayton":
+        return ClaytonCopulaModel(theta=theta)
+    if name == "frank":
+        return FrankCopulaModel(theta=theta)
     raise SystemExit(f"Unknown model: {name!r}")
 
 
@@ -37,10 +45,12 @@ def _build_parser() -> argparse.ArgumentParser:
     est.add_argument(
         "--model",
         default="hullwhite",
-        choices=["independent", "hullwhite", "copula"],
+        choices=["independent", "hullwhite", "copula", "clayton", "frank"],
     )
     est.add_argument("--b", type=float, default=0.0, help="Hull-White WWR coupling.")
-    est.add_argument("--rho", type=float, default=0.0, help="Copula correlation.")
+    est.add_argument("--rho", type=float, default=0.0, help="Gaussian-copula correlation.")
+    est.add_argument("--theta", type=float, default=2.0,
+                     help="Archimedean (clayton/frank) dependence parameter.")
     est.add_argument("--recovery", type=float, default=0.4, help="Recovery rate.")
     est.add_argument("--pfe-quantile", type=float, default=0.95)
     est.add_argument("--out", default=None, help="Optional JSON output path.")
@@ -53,7 +63,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "estimate":
-        model = _build_model(args.model, args.b, args.rho)
+        model = _build_model(args.model, args.b, args.rho, args.theta)
         sink = JsonReportWriter(args.out) if args.out else None
         result = estimate_wwr(
             exposure=CsvExposureSource(args.exposure),

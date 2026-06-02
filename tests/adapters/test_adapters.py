@@ -97,3 +97,12 @@ def test_cli_end_to_end(tmp_path) -> None:
     ])
     assert rc == 0
     assert json.loads(outp.read_text())["model"] == "HullWhiteHazardModel"
+
+    # the advanced Archimedean models are reachable from the CLI too
+    out2 = tmp_path / "res2.json"
+    rc2 = main([
+        "estimate", "--exposure", str(cp), "--credit", str(crp),
+        "--model", "clayton", "--theta", "2.0", "--out", str(out2),
+    ])
+    assert rc2 == 0
+    assert json.loads(out2.read_text())["model"] == "ClaytonCopulaModel"

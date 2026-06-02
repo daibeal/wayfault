@@ -6,11 +6,13 @@ A **dependence model** couples default timing to portfolio value to produce a
 calibrated to the input credit curve so that, integrated over the exposure
 distribution, it reproduces the marginal PDs (arbitrage consistency).
 
-| Model                                                                       | Knob | WWR when | Dependencies |
-|-----------------------------------------------------------------------------|------|----------|--------------|
-| [`IndependentModel`][wayfault.adapters.outbound.dependence_independent.IndependentModel]   | —    | —        | numpy        |
-| [`HullWhiteHazardModel`][wayfault.adapters.outbound.dependence_hullwhite.HullWhiteHazardModel] | `b`  | `b > 0`  | numpy        |
-| [`GaussianCopulaModel`][wayfault.adapters.outbound.dependence_copula.GaussianCopulaModel]   | `ρ`  | `ρ > 0`  | numpy        |
+| Model                                                                       | Knob | WWR when | Tail dep. | Dependencies |
+|-----------------------------------------------------------------------------|------|----------|-----------|--------------|
+| [`IndependentModel`][wayfault.adapters.outbound.dependence_independent.IndependentModel]   | —    | —        | —         | numpy        |
+| [`HullWhiteHazardModel`][wayfault.adapters.outbound.dependence_hullwhite.HullWhiteHazardModel] | `b`  | `b > 0`  | —         | numpy        |
+| [`GaussianCopulaModel`][wayfault.adapters.outbound.dependence_copula.GaussianCopulaModel]   | `ρ`  | `ρ > 0`  | none      | numpy        |
+| [`ClaytonCopulaModel`][wayfault.adapters.outbound.dependence_archimedean.ClaytonCopulaModel] | `θ`  | `θ > 0`  | lower     | numpy        |
+| [`FrankCopulaModel`][wayfault.adapters.outbound.dependence_archimedean.FrankCopulaModel]     | `θ`  | `θ > 0`  | none      | numpy        |
 
 ## Independent
 
@@ -67,6 +69,44 @@ score of the portfolio value. The sign of $\rho$ mirrors WWR/RWR.
 from wayfault.adapters.outbound.dependence_copula import GaussianCopulaModel
 model = GaussianCopulaModel(rho=0.6)   # rho in (-1, 1)
 ```
+
+## Archimedean copulas (advanced)
+
+Archimedean copulas couple the credit and market margins through a closed-form
+generator, capturing **asymmetric tail dependence** — the realistic shape of
+wrong-way risk, where defaults cluster precisely in the high-exposure tail. Both
+are numpy-only (no SciPy) and use the copula *h-function* (conditional CDF) as
+the per-scenario default re-weight. The market margin is oriented so high
+exposure maps to the lower tail, making a positive parameter wrong-way.
+
+### Clayton
+
+Lower-tail dependence via the Clayton generator. `θ > 0`; larger `θ` means
+stronger clustering of defaults with high exposure. `θ → 0` is independence.
+
+$$
+h(u \mid v) = v^{-(\theta+1)}\big(u^{-\theta} + v^{-\theta} - 1\big)^{-(\theta+1)/\theta}
+$$
+
+```python
+from wayfault.adapters.outbound.dependence_archimedean import ClaytonCopulaModel
+model = ClaytonCopulaModel(theta=2.0)   # theta > 0, wrong-way, lower-tail
+```
+
+### Frank
+
+Symmetric (no tail dependence); the **sign** of `θ` flips the direction.
+
+```python
+from wayfault.adapters.outbound.dependence_archimedean import FrankCopulaModel
+wrong_way = FrankCopulaModel(theta=4.0)    # theta > 0
+right_way = FrankCopulaModel(theta=-4.0)   # theta < 0
+```
+
+!!! info "Performance"
+    All built-in models are **fully vectorised** across tenors — the entire
+    exposure cube is re-weighted in a single numpy expression, with no per-tenor
+    Python loop. See [Performance](performance.md) for batching and parallelism.
 
 ## Writing your own
 

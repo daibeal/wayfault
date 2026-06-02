@@ -78,11 +78,15 @@ python -m wayfault estimate \
 
 ## Dependence models
 
-| Model                   | Knob | WWR when | Notes                                   |
-|-------------------------|------|----------|-----------------------------------------|
-| `IndependentModel`      | —    | —        | conditional EE ≡ unconditional EE       |
-| `HullWhiteHazardModel`  | `b`  | `b > 0`  | `λ(t) = exp(a(t) + b·V(t))` (Hull–White)|
-| `GaussianCopulaModel`   | `ρ`  | `ρ > 0`  | one-factor Gaussian copula              |
+| Model                   | Knob | WWR when | Notes                                       |
+|-------------------------|------|----------|---------------------------------------------|
+| `IndependentModel`      | —    | —        | conditional EE ≡ unconditional EE           |
+| `HullWhiteHazardModel`  | `b`  | `b > 0`  | `λ(t) = exp(a(t) + b·V(t))` (Hull–White)    |
+| `GaussianCopulaModel`   | `ρ`  | `ρ > 0`  | one-factor Gaussian copula                  |
+| `ClaytonCopulaModel`    | `θ`  | `θ > 0`  | Archimedean, **lower-tail dependence**      |
+| `FrankCopulaModel`      | `θ`  | `θ > 0`  | Archimedean, symmetric (sign sets direction)|
+
+All models are numpy-only and **fully vectorised** across tenors.
 
 ## Calibration
 
@@ -108,6 +112,29 @@ from wayfault.adapters.outbound import viz
 fig = viz.plot_dashboard(result, bs=bs, alphas=alphas, wwr_cvas=wwr_cvas)
 viz.save(fig, "dashboard.png")
 ```
+
+## Performance
+
+Two acceleration techniques, both numpy-only:
+
+- **Vectorised re-weighting** — every model re-weights the whole exposure cube
+  in a single numpy expression (no per-tenor Python loop).
+- **Parallel batch & sweep** — `wayfault.application.parallel` fans independent
+  estimates across workers with deterministic, input-order results:
+
+```python
+from wayfault.application.parallel import sweep_models
+from wayfault.adapters.outbound.dependence_hullwhite import HullWhiteHazardModel
+
+results = sweep_models(
+    exposure, credit,
+    [HullWhiteHazardModel(b=b) for b in np.linspace(-1.2, 1.2, 25)],
+    max_workers=8,            # threads (numpy releases the GIL); or pass a ProcessPoolExecutor
+)
+alphas = [r.alpha for r in results]
+```
+
+See the [Performance docs](https://daibeal.github.io/wayfault/performance/).
 
 ## Development
 

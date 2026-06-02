@@ -35,6 +35,8 @@ lazily inside the methods that need them.
 
 ::: wayfault.adapters.outbound.dependence_copula
 
+::: wayfault.adapters.outbound.dependence_archimedean
+
 ## Outbound — Calibrators
 
 ::: wayfault.adapters.outbound.calibrator_regression

@@ -50,20 +50,23 @@ class HullWhiteHazardModel:
     def conditional_ee(
         self, cube: ExposureCube, curve: CreditCurve, grid: TenorGrid
     ) -> EEProfile:
-        """Conditional EE by re-weighting scenarios toward their default risk."""
-        positive = np.maximum(cube.values, 0.0)
-        n_tenors = grid.n
-        out = np.empty(n_tenors)
-        a = np.empty(n_tenors)
+        """Conditional EE by re-weighting scenarios toward their default risk.
+
+        Fully vectorised: every tenor column is re-weighted in a single numpy
+        expression via the shared column-wise softmax core.
+        """
+        v = cube.values
+        weights = _reweight.softmax_columns(self.b * v)
+        out = _reweight.conditional_ee_columns(v, weights)
+
+        # Offsets a(t) implied by reproducing the marginal PD in expectation
+        # (kept for diagnostics; they cancel in the normalised expectation).
         pd_target = curve.marginal_pd(grid)
-        for i in range(n_tenors):
-            v = cube.values[:, i]
-            weights = _reweight.softmax_weights(self.b * v)
-            out[i] = float(np.sum(positive[:, i] * weights))
-            # Offset a_i implied by reproducing the marginal PD in expectation.
-            mean_exp = float(np.mean(np.exp(self.b * (v - np.max(v)))))
-            a[i] = np.log(max(pd_target[i], 1e-300)) - np.max(self.b * v) - np.log(mean_exp)
-        self._a = a
+        shifted = self.b * (v - v.max(axis=0, keepdims=True))
+        mean_exp = np.mean(np.exp(shifted), axis=0)
+        self._a = np.log(np.maximum(pd_target, 1e-300)) - (self.b * v).max(axis=0) - np.log(
+            mean_exp
+        )
         return EEProfile(grid, out)
 
     def implied_marginal_pd(
@@ -76,12 +79,9 @@ class HullWhiteHazardModel:
         normalised exposure weight, whose scenario mean is the target.
         """
         pd_target = curve.marginal_pd(grid)
-        implied = np.empty(grid.n)
-        for i in range(grid.n):
-            v = cube.values[:, i]
-            w = _reweight.softmax_weights(self.b * v)
-            per_scenario = pd_target[i] * w * v.size  # q_i(s) with mean pd_target
-            implied[i] = float(np.mean(per_scenario))
+        w = _reweight.softmax_columns(self.b * cube.values)
+        # q_i(s) = pd_target_i * w_{s,i} * S has column mean exactly pd_target_i.
+        implied: np.ndarray = np.mean(pd_target[None, :] * w * cube.n_scenarios, axis=0)
         return implied
 
     def dependence_param(self) -> float:
