@@ -2,6 +2,19 @@
 
 **Wrong-Way Risk (WWR) estimation for counterparty credit risk.**
 
+[![PyPI](https://img.shields.io/pypi/v/wayfault.svg)](https://pypi.org/project/wayfault/)
+[![Python](https://img.shields.io/pypi/pyversions/wayfault.svg)](https://pypi.org/project/wayfault/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/daibeal/wayfault/blob/main/LICENSE)
+[![Docs](https://img.shields.io/badge/docs-mkdocs-blue.svg)](https://daibeal.github.io/wayfault/)
+[![Playground](https://img.shields.io/badge/playground-live-success.svg)](https://daibeal.github.io/wayfault/playground/)
+
+📖 **[Documentation](https://daibeal.github.io/wayfault/)** ·
+🎮 **[Live playground](https://daibeal.github.io/wayfault/playground/)** ·
+📊 **[Worked example](https://daibeal.github.io/wayfault/#worked-example-wrong-way-risk-on-a-5-year-swap)** ·
+📄 **[Paper (PDF)](https://github.com/daibeal/wayfault/blob/main/paper/wayfault.pdf)**
+
+![wayfault dashboard](https://raw.githubusercontent.com/daibeal/wayfault/main/docs/assets/img/dashboard.png)
+
 `wayfault` quantifies the adverse dependence between exposure and counterparty
 credit quality — the risk that exposure rises precisely when the counterparty
 deteriorates (WWR), and its favourable mirror, Right-Way Risk (RWR). It takes a
@@ -36,8 +49,14 @@ raise a clear `MissingDependencyError` if the extra is not installed.
 ## Install
 
 ```bash
-pip install -e .                       # core (numpy only)
-pip install -e '.[io,ml,viz,dev]'      # with all optional extras + tooling
+pip install wayfault                   # core (numpy only)
+pip install 'wayfault[io,ml,viz]'      # with optional extras
+```
+
+For local development (editable install with the dev tooling):
+
+```bash
+pip install -e '.[io,ml,viz,dev]'
 ```
 
 Optional extras:
@@ -70,7 +89,8 @@ result = estimate_wwr(
 print(result.baseline_cva, result.wwr_cva, result.alpha, result.classification)
 ```
 
-A full runnable example lives in [`examples/quickstart.py`](examples/quickstart.py)
+A full runnable example lives in
+[`examples/quickstart.py`](https://github.com/daibeal/wayfault/blob/main/examples/quickstart.py)
 and uses only the in-memory adapters (zero extras).
 
 ## CLI
@@ -122,9 +142,9 @@ numpy-only. Regenerate the gallery with `pip install 'wayfault[viz]'` then
 |  |  |
 |--|--|
 | **Exposure profiles** — EPE vs conditional EE, shaded WWR adjustment | **EE ratio** — per-tenor conditional/unconditional |
-| ![Exposure profiles](docs/assets/img/exposure_profiles.png) | ![EE ratio](docs/assets/img/ee_ratio.png) |
+| ![Exposure profiles](https://raw.githubusercontent.com/daibeal/wayfault/main/docs/assets/img/exposure_profiles.png) | ![EE ratio](https://raw.githubusercontent.com/daibeal/wayfault/main/docs/assets/img/ee_ratio.png) |
 | **Alpha sweep** — alpha & CVA vs the dependence knob | **Dashboard** — everything at a glance |
-| ![Alpha sweep](docs/assets/img/alpha_sweep.png) | ![Dashboard](docs/assets/img/dashboard.png) |
+| ![Alpha sweep](https://raw.githubusercontent.com/daibeal/wayfault/main/docs/assets/img/alpha_sweep.png) | ![Dashboard](https://raw.githubusercontent.com/daibeal/wayfault/main/docs/assets/img/dashboard.png) |
 
 ```python
 from wayfault.adapters.outbound import viz
