@@ -89,6 +89,26 @@ python -m wayfault estimate \
 - `RegressionCalibrator` — numpy-only OLS estimate of the Hull–White `b`.
 - `SklearnSurvivalCalibrator` — `[ml]` covariate-hazard surrogate.
 
+## Visualization
+
+The `[viz]` extra adds a beautiful matplotlib plotting module
+(`wayfault.adapters.outbound.viz`) — lazily imported, so the core stays
+numpy-only. Regenerate the gallery with `pip install 'wayfault[viz]'` then
+`python examples/gallery.py`.
+
+|  |  |
+|--|--|
+| **Exposure profiles** — EPE vs conditional EE, shaded WWR adjustment | **EE ratio** — per-tenor conditional/unconditional |
+| ![Exposure profiles](docs/assets/img/exposure_profiles.png) | ![EE ratio](docs/assets/img/ee_ratio.png) |
+| **Alpha sweep** — alpha & CVA vs the dependence knob | **Dashboard** — everything at a glance |
+| ![Alpha sweep](docs/assets/img/alpha_sweep.png) | ![Dashboard](docs/assets/img/dashboard.png) |
+
+```python
+from wayfault.adapters.outbound import viz
+fig = viz.plot_dashboard(result, bs=bs, alphas=alphas, wwr_cvas=wwr_cvas)
+viz.save(fig, "dashboard.png")
+```
+
 ## Development
 
 ```bash

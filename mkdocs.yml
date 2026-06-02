@@ -41,6 +41,7 @@ nav:
   - Architecture: architecture.md
   - Dependence Models: models.md
   - Calibration: calibration.md
+  - Visualization: visualization.md
   - CLI: cli.md
   - API Reference:
       - Overview: api/index.md

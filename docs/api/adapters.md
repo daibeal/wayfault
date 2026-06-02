@@ -44,3 +44,8 @@ lazily inside the methods that need them.
 ## Outbound — Sinks
 
 ::: wayfault.adapters.outbound.sinks
+
+## Outbound — Visualization
+
+The plotting API is documented on the dedicated
+[Visualization](../visualization.md) page.

@@ -51,6 +51,7 @@ class WrongWayRiskService:
             wwr_cva=wwr_cva,
             alpha=alpha,
             classification=classification,
+            tenors=grid.times,
             epe=epe_profile.values,
             conditional_ee=conditional.values,
             pfe=pfe_profile,

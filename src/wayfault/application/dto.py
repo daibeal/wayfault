@@ -52,6 +52,8 @@ class WWRResult:
         The independent CVA, the WWR-adjusted CVA, and their ratio.
     classification:
         WWR / RWR / NEUTRAL label.
+    tenors:
+        The tenor grid year-fractions (x-axis for the per-tenor profiles).
     epe, conditional_ee, pfe:
         Per-tenor profiles (numpy arrays).
     eepe:
@@ -68,6 +70,7 @@ class WWRResult:
     wwr_cva: float
     alpha: float
     classification: WWRClass
+    tenors: np.ndarray
     epe: np.ndarray
     conditional_ee: np.ndarray
     pfe: np.ndarray
@@ -86,6 +89,7 @@ class WWRResult:
             "wwr_cva": self.wwr_cva,
             "alpha": self.alpha,
             "classification": self.classification.value,
+            "tenors": self.tenors.tolist(),
             "epe": self.epe.tolist(),
             "conditional_ee": self.conditional_ee.tolist(),
             "pfe": self.pfe.tolist(),
