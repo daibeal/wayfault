@@ -100,6 +100,18 @@ All models are numpy-only and **fully vectorised** across tenors.
 - `RegressionCalibrator` — numpy-only OLS estimate of the Hull–White `b`.
 - `SklearnSurvivalCalibrator` — `[ml]` covariate-hazard surrogate.
 
+### Inverse solvers (prescriptive)
+
+Invert the relationship — target-driven calibration and reverse-stress:
+
+```python
+from wayfault import calibrate_to_alpha, find_breakpoint
+hw = lambda b: HullWhiteHazardModel(b=b)
+
+calibrate_to_alpha(exposure, credit, hw, target_alpha=1.25, lo=-1.5, hi=1.5)  # which b -> alpha 1.25?
+find_breakpoint(exposure, credit, hw, threshold=1.40, lo=0.0, hi=3.0)          # b where alpha breaches 1.40
+```
+
 ## Visualization
 
 The `[viz]` extra adds a beautiful matplotlib plotting module

@@ -57,3 +57,42 @@ If `scikit-learn` is not installed, calling `.fit(...)` raises a clear
 ```bash
 pip install 'wayfault[ml]'
 ```
+
+## Inverse solvers (prescriptive)
+
+Calibrators estimate parameters from *historical data*. The **inverse solvers**
+go the other way — they answer **target-driven** and **reverse-stress**
+questions by root-finding on the monotone metric-vs-parameter curve (robust
+bisection, numpy-only):
+
+- [`calibrate_to_alpha`][wayfault.calibrate_to_alpha] — find the dependence
+  parameter that reproduces a **target alpha** (e.g. a desk/regulator number).
+- [`calibrate_to_cva`][wayfault.calibrate_to_cva] — find the parameter that
+  reproduces a **target WWR-CVA** (e.g. a historically observed CVA).
+- [`find_breakpoint`][wayfault.find_breakpoint] — find the dependence level at
+  which a metric (alpha, WWR-CVA, or EAD) **crosses a threshold**:
+  *"how much wrong-way correlation until we breach?"*.
+
+You supply a `model_factory` mapping a scalar to a dependence model, so the same
+solver works for Hull-White `b`, Gaussian `ρ`, or a copula `θ`.
+
+```python
+from wayfault import calibrate_to_alpha, find_breakpoint
+from wayfault.adapters.outbound.dependence_hullwhite import HullWhiteHazardModel
+
+hw = lambda b: HullWhiteHazardModel(b=b)
+
+# 1) Calibrate: which b reproduces a desk target alpha of 1.25?
+sol = calibrate_to_alpha(exposure, credit, hw, target_alpha=1.25, lo=-1.5, hi=1.5)
+print(sol.param, sol.converged)        # -> ~the b giving alpha = 1.25
+
+# 2) Reverse stress: at what b does alpha breach 1.40?
+brk = find_breakpoint(exposure, credit, hw, threshold=1.40, lo=0.0, hi=3.0)
+print(brk.param, brk.result.classification)
+```
+
+Each returns a [`SolveResult`][wayfault.SolveResult] carrying the solved
+`param`, the `achieved` metric, `iterations`, a `converged` flag, and the full
+`result` ([`WWRResult`][wayfault.WWRResult]) at the solution. The solve is
+deterministic. If `[lo, hi]` does not bracket the target, a clear
+[`ValidationError`][wayfault.ValidationError] is raised.
