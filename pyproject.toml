@@ -1,0 +1,62 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "wayfault"
+version = "0.1.0"
+description = "Wrong-Way Risk (WWR) estimation for counterparty credit risk."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "wayfault contributors" }]
+keywords = ["wrong-way-risk", "cva", "xva", "counterparty-credit-risk", "quant"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Office/Business :: Financial",
+]
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+io = ["pandas>=2.0", "pyarrow>=12.0"]
+ml = ["scikit-learn>=1.3"]
+viz = ["matplotlib>=3.7"]
+dev = ["pytest>=7.4", "pytest-cov>=4.1", "mypy>=1.8", "ruff>=0.3"]
+
+[project.urls]
+Homepage = "https://github.com/example/wayfault"
+Repository = "https://github.com/example/wayfault"
+
+[project.scripts]
+wayfault = "wayfault.adapters.inbound.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/wayfault"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "C4", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+files = ["src"]
+plugins = []
+
+[[tool.mypy.overrides]]
+module = ["pandas.*", "pyarrow.*", "sklearn.*", "matplotlib.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["wayfault.domain", "wayfault.application"]
